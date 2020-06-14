@@ -49,12 +49,11 @@ class Incrementer extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {nombre: this.props.start, pas: this.props}
-        this.nb = null
+        this.state = {nombre: this.props.start, step: this.props.step, timer: null}
     }
 
     componentDidMount() {
-        window.setInterval(this.add.bind(this), 1000)
+        this.play()
     }
 
     add() {
@@ -64,19 +63,51 @@ class Incrementer extends React.Component {
     }
 
     componentwillUnmount() {
-        window.clearInterval(this.nb)
+        window.clearInterval(this.state.timer)
     }
 
+    pause() {
+        window.clearInterval(this.state.timer)
+        this.setState({
+            timer: null
+        })
+    }
+
+    play() {
+        window.clearInterval(this.state.timer)
+        this.setState({
+            timer: window.setInterval(this.add.bind(this), 1000)
+        })
+    }
+
+    toggle (){
+        return this.state.timer ? this.pause() : this.play()
+    }
+
+    label () {
+        console.log(this.state.timer)
+        return this.state.timer ? 'Pause' : 'Play'
+    }
+
+    reset() {
+        this.setState(function (state, props) {
+            return {nombre: 0}
+        })
+    }
 
     render() {
-        return <h2>{this.state.nombre}</h2>
+        return <div>
+            <h2>{this.state.nombre}</h2>
+            <button className="btn btn-primary" onClick={this.toggle.bind(this)}>{this.label()}</button>
+            <button className="btn btn-danger" onClick={this.reset.bind(this)}>Reset</button>
+        </div>
     }
 }
 
 Incrementer.defaultProps = {
     start: 0,
     step: 1
-}
+};
 
 
 class ManualIncrementer extends React.Component {
@@ -98,10 +129,9 @@ class ManualIncrementer extends React.Component {
 
 function Home() {
     return <div>
-        <Welcome name="Dorothée"></Welcome>
-        <Welcome name="Jean"></Welcome>
-        <Clock></Clock>
-        <ManualIncrementer></ManualIncrementer>
+        <Welcome name="Dorothée"/>
+        <Clock/>
+        <Incrementer/>
     </div>
 }
 
